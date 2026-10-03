@@ -23,79 +23,80 @@ const PublicViews = (() => {
     }
 
     function productPreview() {
-        const bars = [35, 58, 42, 72, 49, 88]
-            .map((height) => `<i style="height: ${height}%"></i>`)
-            .join("");
-
         return `
-            <div class="hero-preview hero-enter-preview" data-parallax-dashboard>
-                <div class="preview-label">LIVE PRODUCT PREVIEW</div>
-                <div class="preview-glow" aria-hidden="true"></div>
-                <div class="preview-window">
-                    <div class="preview-side">
-                        <span class="brand-mark">P</span>
-                        <i>⌂</i><i>↕</i><i>◉</i><i>◇</i><i>▥</i>
+            <div class="hero-visual hero-enter-preview" data-parallax-dashboard>
+                <div class="hero-visual-glow" aria-hidden="true"></div>
+
+                <article class="student-scene scene-spending" data-parallax-card="1">
+                    <div class="scene-photo photo-spending" role="img" aria-label="University student checking spending on a smartphone"></div>
+                    <div class="device device-phone" aria-hidden="true">
+                        <div class="device-notch"></div>
+                        <div class="device-screen">
+                            <small>PocketWise</small>
+                            <strong>₦2,500</strong>
+                            <span>Food · Today</span>
+                            <i>−</i>
+                        </div>
                     </div>
-                    <div class="preview-content">
-                        <div class="preview-status">
-                            <i></i>
+                    <div class="scene-tag"><b>−₦2,500</b><span>Food</span></div>
+                </article>
+
+                <article class="student-scene scene-budget" data-parallax-card="-1">
+                    <div class="scene-photo photo-budget" role="img" aria-label="University student planning a budget on a laptop"></div>
+                    <div class="device device-laptop" aria-hidden="true">
+                        <div class="laptop-screen">
+                            <span>Monthly budget</span>
+                            <strong>₦50,000</strong>
+                            <div class="mini-progress"><i></i></div>
+                            <small>72% used</small>
+                        </div>
+                        <div class="laptop-base"></div>
+                    </div>
+                    <div class="scene-tag"><b>₦50,000</b><span>Monthly budget</span></div>
+                </article>
+
+                <article class="student-scene scene-savings" data-parallax-card="1">
+                    <div class="scene-photo photo-savings" role="img" aria-label="University student working toward a savings goal"></div>
+                    <div class="device device-tablet" aria-hidden="true">
+                        <div class="tablet-screen">
+                            <small>Savings goal</small>
+                            <strong>₦25,000</strong>
+                            <div class="mini-progress"><i></i></div>
+                            <span>50% complete</span>
+                        </div>
+                    </div>
+                    <div class="scene-tag"><b>₦25,000 / ₦50,000</b><span>Laptop goal</span></div>
+                </article>
+
+                <div class="hero-dashboard-card">
+                    <div class="dashboard-card-top">
+                        <div>
+                            <small>POCKETWISE</small>
                             <span>Your finances, organized</span>
                         </div>
-                        <small>Good afternoon, Ada 👋</small>
-                        <h3>Financial overview</h3>
-                        <div class="preview-stats">
-                            <div>
-                                <span>Current balance</span>
-                                <b data-demo-amount="85400" data-demo-start="75000">₦75,000</b>
-                            </div>
-                            <div><span>Income</span><b data-demo-amount="120000">₦0</b></div>
-                            <div><span>Expenses</span><b data-demo-amount="34600">₦0</b></div>
-                        </div>
-                        <div class="preview-lower">
-                            <div class="preview-chart">
-                                <span>Monthly spending</span>
-                                <div class="bars">${bars}</div>
-                            </div>
-                            <div class="preview-goal">
-                                <span>Laptop goal</span>
-                                <b>₦25,000</b>
-                                <div class="progress preview-progress" role="progressbar" aria-label="Laptop savings progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span style="width: 50%"></span></div>
-                                <small>50% complete</small>
-                            </div>
-                        </div>
-                        <div class="preview-feed" aria-label="Demonstration activity">
-                            <span>RECENT ACTIVITY</span>
-                            <div data-feed-item><i>✓</i><b>Income added</b><strong>+₦120,000</strong></div>
-                            <div data-feed-item><i>✓</i><b>Food expense</b><strong>−₦2,500</strong></div>
-                            <div data-feed-item><i>✓</i><b>Savings contribution</b><strong>+₦5,000</strong></div>
-                            <div data-feed-item><i>✓</i><b>Budget on track</b><strong>62% used</strong></div>
-                        </div>
+                        <i>●</i>
                     </div>
-                </div>
-                <div class="preview-notice">
-                    <span>✓</span>
-                    <div><strong>Budget on track</strong><small>62% used this month</small></div>
-                </div>
-                <div class="floating-activity activity-food" data-parallax-card="1">
-                    <span>−₦2,500</span><small>Food</small>
-                </div>
-                <div class="floating-activity activity-savings" data-parallax-card="-1">
-                    <span>+₦5,000</span><small>Savings</small>
-                </div>
-                <div class="floating-activity activity-income" data-parallax-card="1">
-                    <span>+₦120,000</span><small>Income added</small>
-                </div>
-                <div class="student-story" data-student-story data-parallax-card="-1" aria-label="A student reviewing their PocketWise finances">
-                    <div class="student-avatar" aria-hidden="true">
-                        <span class="student-hair"></span><span class="student-face"></span><span class="student-body"></span>
+                    <div class="dashboard-balance">
+                        <small>Available balance</small>
+                        <strong data-demo-amount="85400" data-demo-start="75000">₦75,000</strong>
                     </div>
-                    <div class="student-story-copy">
-                        <small>ADA'S MONEY CHECK-IN</small>
-                        <strong data-story-label>Reviewing today's spending</strong>
-                        <span data-story-detail>Food budget is still on track</span>
+                    <div class="dashboard-metrics">
+                        <div><span>Income</span><b data-demo-amount="120000">₦0</b></div>
+                        <div><span>Expenses</span><b data-demo-amount="34600">₦0</b></div>
+                        <div><span>Saved</span><b>₦25,000</b></div>
                     </div>
-                    <i class="story-live-dot" aria-hidden="true"></i>
+                    <div class="dashboard-activity">
+                        <small>RECENT ACTIVITY</small>
+                        <div><span><i>+</i> Income added</span><b>+₦120,000</b></div>
+                        <div><span><i>−</i> Food</span><b>−₦2,500</b></div>
+                        <div><span><i>+</i> Savings</span><b>+₦5,000</b></div>
+                    </div>
+                    <div class="dashboard-footer"><span>Monthly budget</span><b>62% used</b></div>
                 </div>
+
+                <div class="finance-event event-one">+₦120,000 <span>income</span></div>
+                <div class="finance-event event-two">−₦2,500 <span>food</span></div>
+                <div class="finance-event event-three">+₦5,000 <span>savings</span></div>
             </div>
         `;
     }
