@@ -509,3 +509,52 @@
         margin: -14px auto 0;
     }
 }
+
+/* Premium landing hero responsive overrides */
+@media (max-width: 900px) {
+    .hero-visual {
+        min-height: 590px;
+        width: min(650px, 100%);
+        margin: 0 auto;
+    }
+}
+@media (max-width: 700px) {
+    .hero-visual {
+        min-height: 560px;
+        margin-top: 8px;
+    }
+    .scene-spending { left: 0; top: 20px; width: 170px; }
+    .scene-budget { right: 0; top: 0; width: 205px; }
+    .scene-savings { right: 0; bottom: 10px; width: 180px; }
+    .scene-photo { height: 205px; border-width: 5px; border-radius: 19px; }
+    .photo-budget,.photo-savings { height: 165px; }
+    .hero-dashboard-card {
+        width: min(300px, 78%);
+        top: 122px;
+        padding: 16px;
+        border-radius: 18px;
+    }
+    .dashboard-balance { margin-top: 17px; }
+    .dashboard-balance strong { font-size: 23px; }
+    .dashboard-metrics { gap: 5px; }
+    .dashboard-metrics > div { padding: 7px; }
+    .dashboard-activity > div:nth-of-type(3) { display:none; }
+    .device-phone { width: 70px; height: 135px; right:-23px; }
+    .device-laptop { width: 135px; bottom:-23px; }
+    .laptop-screen { height:76px; padding:8px; }
+    .laptop-screen strong { font-size:13px; margin-top:6px; }
+    .device-tablet { width:82px; height:112px; left:-27px; bottom:-17px; }
+    .tablet-screen { padding:9px 7px; }
+    .tablet-screen strong { font-size:10px; margin:9px 0 6px; }
+    .scene-tag { padding:7px 8px; right:8px; top:9px; }
+    .scene-tag b { font-size:9px; }
+    .scene-tag span { font-size:6px; }
+    .finance-event { font-size:8px; padding:7px 9px; }
+    .event-one { right:4px; top:88px; }
+    .event-two { left:4px; top:310px; }
+    .event-three { right:30px; bottom:0; }
+}
+@media (max-width: 390px) {
+    .hero-visual { min-height: 500px; transform:scale(.94); transform-origin:top center; margin-bottom:-25px; }
+    .hero-dashboard-card { width: 290px; }
+}
