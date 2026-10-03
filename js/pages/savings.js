@@ -1,80 +1,8 @@
 const SavingsPage = (() => {
-    function renderGoal(goal, percentage) {
-        const progress = percentage(goal.current_amount, goal.target_amount);
-        const isComplete = progress >= 100;
-        const remaining = goal.target_amount - goal.current_amount;
-
-        return `
-            <article class="card goal-card ${isComplete ? "complete" : ""}">
-                <div class="goal-top">
-                    <span class="goal-icon">${isComplete ? "✓" : "◇"}</span>
-                    <div class="row-actions">
-                        <button
-                            class="icon-button"
-                            data-action="edit-goal"
-                            data-id="${goal.id}"
-                            aria-label="Edit ${UI.escape(goal.name)}"
-                        >
-                            ✎
-                        </button>
-                        <button
-                            class="icon-button danger-icon"
-                            data-action="delete-goal"
-                            data-id="${goal.id}"
-                            aria-label="Delete ${UI.escape(goal.name)}"
-                        >
-                            ×
-                        </button>
-                    </div>
-                </div>
-                <h2>${UI.escape(goal.name)}</h2>
-                <p>${UI.escape(goal.description || "A PocketWise savings goal")}</p>
-                <strong class="big-number">${UI.money(goal.current_amount)}</strong>
-                <span>of ${UI.money(goal.target_amount)} saved</span>
-                ${UI.progress(progress)}
-                <div class="split">
-                    <strong>${Math.min(progress, 100)}% complete</strong>
-                    <span>
-                        ${isComplete ? "Goal achieved" : `${UI.money(remaining)} left`}
-                    </span>
-                </div>
-                <div class="goal-footer">
-                    <span>Target · ${UI.date(goal.target_date)}</span>
-                    <button
-                        class="button small primary"
-                        data-action="add-saving"
-                        data-id="${goal.id}"
-                        ${isComplete ? "disabled" : ""}
-                    >
-                        ${isComplete ? "Completed" : "+ Add money"}
-                    </button>
-                </div>
-            </article>
-        `;
+    function render(context){
+        const data=context.data;
+        let cards=data.goals.map(function(g){const p=context.percentage(g.current_amount,g.target_amount);const remaining=Math.max(0,g.target_amount-g.current_amount);return '<article class="goal-card surface-card"><div class="goal-card-top"><span class="goal-badge large">◇</span><div class="row-actions"><button class="icon-button" data-action="edit-goal" data-id="'+g.id+'">✎</button><button class="icon-button danger-icon" data-action="delete-goal" data-id="'+g.id+'">×</button></div></div><h2>'+UI.escape(g.name)+'</h2><p>'+UI.escape(g.description||"A goal worth planning for.")+'</p><div class="goal-number">'+UI.money(g.current_amount)+' <span>/ '+UI.money(g.target_amount)+'</span></div><div class="mini-progress tall"><i style="width:'+Math.min(100,p)+'%"></i></div><div class="goal-meta"><span>'+p+'% complete</span><span>'+ (remaining?UI.money(remaining)+" left":"Goal reached") +'</span></div><div class="goal-bottom"><small>Target · '+UI.date(g.target_date)+'</small><button class="button small primary" data-action="add-saving" data-id="'+g.id+'" '+(p>=100?"disabled":"")+'>+ Add</button></div></article>';}).join("");
+        return context.pageHeader("Goals","Save toward the things you care about.",'<button class="button primary" data-action="add-goal">+ Create goal</button>')+'<section class="goals-grid premium-grid">'+(cards||UI.empty("No goals yet","Create a target like a laptop, emergency fund or school fees.","add-goal","Create goal"))+'</section>';
     }
-
-    function render(context) {
-        const { data, pageHeader, percentage } = context;
-        const goals = data.goals.length
-            ? data.goals.map((goal) => renderGoal(goal, percentage)).join("")
-            : UI.empty(
-                  "No savings goals yet",
-                  "Create your first goal and start tracking your progress.",
-                  "add-goal",
-                  "Create goal",
-              );
-
-        return `
-            ${pageHeader(
-                "Savings goals",
-                "Turn your plans into steady progress.",
-                `<button class="button primary" data-action="add-goal">
-                    + Create goal
-                </button>`,
-            )}
-            <section class="goals-grid stagger-group">${goals}</section>
-        `;
-    }
-
-    return { render };
+    return {render};
 })();
