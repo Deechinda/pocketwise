@@ -12,7 +12,10 @@ const App = (() => {
     function monthly(){return workspace.transactions.filter(function(x){return x.type==="expense"&&x.date.startsWith(currentMonth());});}
     function percentage(v,t){return t?Math.round(Number(v)/Number(t)*100):0;}
     function categoryTotals(rows){return rows.reduce(function(a,x){if(x.type==="expense")a[x.category]=(a[x.category]||0)+Number(x.amount);return a;},{});}
-    function field(name,label,type,placeholder,extra){return '<label class="field"><span>'+label+'</span><input name="'+name+'" type="'+(type||"text")+'" placeholder="'+(placeholder||"")+'" '+(extra||"")+ '></label>';}
+    function field(name,label,type,placeholder,extra){return '<label class="field"><span>'+label+'</span><input name="'+name+'" type="'+(type||"text")+'" placeholder="'+(placeholder||"")+'" '+(extra||"")+ '></label>';}function choiceGroup(name, options, selected, multiple, note) {
+        const values=multiple?(selected||[]):[selected||options[0]?.value];
+        return '<fieldset class="choice-group '+(multiple?"choice-group-multi":"")+'"><legend>'+options.label+'</legend>'+(note?'<p class="choice-note">'+note+'</p>':"")+'<div class="choice-options">'+options.items.map(function(item){const checked=values.includes(item.value);return '<label class="choice-option"><input type="'+(multiple?"checkbox":"radio")+'" name="'+name+'" value="'+item.value+'" '+(checked?"checked":"")+'><span class="choice-mark"></span><span class="choice-copy"><strong>'+item.label+'</strong>'+(item.note?'<small>'+item.note+'</small>':"")+'</span></label>';}).join("")+'</div></fieldset>';
+    }
     function pageHeader(title,subtitle,actions){return '<header class="page-head"><div><p class="eyebrow">PocketWise</p><h1>'+title+'</h1><p>'+subtitle+'</p></div><div class="page-actions">'+(actions||"")+'</div></header>';}
     function context(){return {data:workspace,session:session,profile:profile,filters:filters,taskFilter:taskFilter,loading:loading,pageHeader:pageHeader,field:field,totals:totals,monthly:monthly,percentage:percentage,categoryTotals:categoryTotals};}
 
@@ -32,8 +35,11 @@ const App = (() => {
     async function reload(message){loading=true;renderPrivate();try{workspace=await Data.all();if(message)UI.toast(message);}catch(e){console.error(e);UI.toast("Could not load your PocketWise data.","error");}finally{loading=false;renderPrivate();}}
     function openTransaction(type,transaction){
         const income=type==="income", categories=income?incomeSources:expenseCategories;
-        const opts=categories.map(function(c){return '<option '+(transaction&&transaction.category===c?"selected":"")+'>'+c+'</option>';}).join("");
-        UI.modal(transaction?"Edit money entry":(income?"Money just came in":"Add spending"),'<form id="transaction-form" data-id="'+(transaction?transaction.id:"")+'"><input type="hidden" name="type" value="'+(transaction?transaction.type:type)+'"><div class="form-grid">'+field("amount","Amount (₦)","number","0",'min="1" value="'+(transaction?transaction.amount:"")+'" required')+field("date","Date","date","",'value="'+(transaction?transaction.date:new Date().toISOString().slice(0,10))+'" required')+field("description",income?"What is it?":"What did you spend on?","text",income?"e.g. Allowance":"e.g. Lunch",'value="'+UI.escape(transaction?transaction.description:"")+'" required maxlength="80"')+'<label class="field"><span>'+(income?"Source":"Category")+'</span><select name="category" required>'+opts+'</select></label></div><p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">Save</button></div></form>','Money');
+        const items=categories.map(function(x){return {value:x,label:x};});
+        const selected=transaction&&transaction.category||items[0].value;
+        const title=transaction?"Edit money entry":(income?"Money just came in":"Add spending");
+        const description=income?"Record money that has become available.":"Keep a simple record of what you spent.";
+        UI.modal(title,'<form id="transaction-form" data-id="'+(transaction?transaction.id:"")+'"><input type="hidden" name="type" value="'+(transaction?transaction.type:type)+'"><div class="modal-intro"><span class="modal-intro-icon">'+(income?"↗":"↘")+'</span><div><strong>'+title+'</strong><small>'+description+'</small></div></div><div class="form-grid">'+field("amount","Amount (₦)","number","0",'min="1" value="'+(transaction?transaction.amount:"")+'" required')+field("date","Date","date","",'value="'+(transaction?transaction.date:new Date().toISOString().slice(0,10))+'" required')+field("description",income?"What is it?":"What did you spend on?","text",income?"e.g. Allowance":"e.g. Lunch",'value="'+UI.escape(transaction?transaction.description:"")+'" required maxlength="80"')+'</div>'+choiceGroup("category",{label:income?"Where did it come from?":"What was it for?",items:items},selected,false,"Choose one so PocketWise can organize your money.")+'<p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">'+(transaction?"Save changes":"Save entry")+'</button></div></form>','Money');
     }
     function openPlan(plan){
         const start=plan?plan.start_date:new Date().toISOString().slice(0,10), end=plan?plan.end_date:new Date(Date.now()+14*86400000).toISOString().slice(0,10);
@@ -42,10 +48,32 @@ const App = (() => {
         UI.modal(plan?"Edit money plan":"Create a money plan",'<form id="plan-form" data-id="'+(plan?plan.id:"")+'">'+field("name","Plan name","text","e.g. October plan",'value="'+(plan?UI.escape(plan.name):"Current plan")+'" required')+'<div class="form-grid">'+field("amount","Money available (₦)","number","0",'value="'+(plan?plan.total_amount:"")+'" min="0" required')+field("start","Starts","date","",'value="'+start+'" required')+field("end","Ends","date","",'value="'+end+'" required')+'</div><p class="form-hint">Divide the amount below. Leave anything unused as unassigned.</p><div class="allocation-editor">'+names.map(function(n){const a=allocations.find(function(x){return x.name===n;});return '<label class="allocation-input"><span>'+n+'</span><input name="alloc_'+n.replace(/[^a-z]/gi,"_").toLowerCase()+'" type="number" min="0" value="'+(a?a.planned_amount:0)+'"><input name="protect_'+n.replace(/[^a-z]/gi,"_").toLowerCase()+'" type="checkbox" '+(a&&a.protected?"checked":"")+'> <small>protect</small></label>';}).join("")+'</div><p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">Save plan</button></div></form>','Plan');
     }
     function openGoal(goal){
-        UI.modal(goal?"Edit goal":"Create savings goal",'<form id="goal-form" data-id="'+(goal?goal.id:"")+'"><div class="form-grid">'+field("name","Goal","text","e.g. Laptop",'value="'+(goal?UI.escape(goal.name):"")+'" required')+field("target","Target amount (₦)","number","0",'value="'+(goal?goal.target_amount:"")+'" min="1" required')+field("current","Already saved (₦)","number","0",'value="'+(goal?goal.current_amount:0)+'" min="0" required')+field("date","Target date","date","",'value="'+(goal?goal.target_date:"")+'" required')+'</div><label class="field"><span>How should you contribute?</span><select name="mode"><option value="manual">I’ll decide each time</option><option value="fixed">Fixed amount when money comes in</option><option value="percentage">Percentage when money comes in</option></select></label><label class="field"><span>Contribution value (optional)</span><input name="contribution" type="number" min="0" value="'+(goal?goal.contribution_value:0)+'" placeholder="e.g. 5000 or 10"></label><label class="field"><span>Notes</span><textarea name="description" maxlength="140">'+(goal?UI.escape(goal.description||""):"")+'</textarea></label><p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">Save goal</button></div></form>','Goal');
+        const modes={label:"How do you want to build this goal?",items:[
+            {value:"manual",label:"I’ll decide each time",note:"Choose an amount whenever money comes in"},
+            {value:"fixed",label:"Set a fixed amount",note:"Automatically suggest the same amount each time"},
+            {value:"percentage",label:"Set a percentage",note:"Suggest a percentage of every money-in entry"}
+        ]};
+        const selected=goal&&goal.contribution_mode||"manual";
+        UI.modal(goal?"Edit savings goal":"Create a savings goal",'<form id="goal-form" data-id="'+(goal?goal.id:"")+'"><div class="modal-intro"><span class="modal-intro-icon">◇</span><div><strong>'+(goal?"Keep the goal moving":"Give your money somewhere to go")+'</strong><small>Set the target, choose a date and decide how you want to contribute.</small></div></div><div class="form-grid">'+field("name","What are you saving for?","text","e.g. Laptop",'value="'+(goal?UI.escape(goal.name):"")+'" required')+field("target","Target amount (₦)","number","450000",'value="'+(goal?goal.target_amount:"")+'" min="1" required')+field("current","Already saved (₦)","number","0",'value="'+(goal?goal.current_amount:0)+'" min="0" required')+field("date","Target date","date","",'value="'+(goal?goal.target_date:"")+'" required')+'</div>'+choiceGroup("mode",modes,selected,false)+field("contribution","Contribution value","number",selected==="percentage"?"e.g. 10":"e.g. 5000",'value="'+(goal?goal.contribution_value:0)+'" min="0"')+'<label class="field"><span>Notes <small>Optional</small></span><textarea name="description" maxlength="140" placeholder="Why does this goal matter?">'+(goal?UI.escape(goal.description||""):"")+'</textarea></label><p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">'+(goal?"Save changes":"Create goal")+'</button></div></form>','Goals');
     }
     function openTask(task){
-        UI.modal(task?"Edit money task":"New money task",'<form id="task-form" data-id="'+(task?task.id:"")+'">'+field("list_name","List name","text","e.g. October essentials",'value="'+(task?UI.escape(task.list_name||"My tasks"):"My tasks")+'" required')+field("title","What needs to happen?","text","e.g. Buy CSC handout",'value="'+(task?UI.escape(task.title):"")+'" required maxlength="100"')+'<div class="form-grid">'+field("amount","Amount (₦)","number","0",'value="'+(task?task.amount:0)+'" min="0"')+field("due","Due date","date","",'value="'+(task&&task.due_date?task.due_date:"")+'"')+'</div><div class="form-grid"><label class="field"><span>Type</span><select name="task_type"><option value="shopping">Shopping</option><option value="school">School</option><option value="bills">Bills & Debts</option><option value="household">Household</option><option value="personal">Personal</option><option value="business">Business</option><option value="custom">Custom</option></select></label><label class="field"><span>Priority</span><select name="priority"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select></label></div><label class="field"><span>Notes</span><textarea name="notes" maxlength="180">'+(task?UI.escape(task.notes||""):"")+'</textarea></label><p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">Save task</button></div></form>','Tasks');
+        const types={label:"What kind of list item is this?",items:[
+            {value:"shopping",label:"Shopping",note:"Groceries, clothes, market items"},
+            {value:"school",label:"School",note:"Books, handouts, uniforms, fees"},
+            {value:"bills",label:"Bills & debts",note:"Payments you need to clear"},
+            {value:"household",label:"Household",note:"Family and home expenses"},
+            {value:"personal",label:"Personal",note:"Something for yourself"},
+            {value:"business",label:"Business",note:"Work or business purchases"},
+            {value:"custom",label:"Custom",note:"Anything else"}
+        ]};
+        const priorities={label:"Priority",items:[{value:"normal",label:"Normal"},{value:"high",label:"Important"},{value:"low",label:"Later"}]};
+        const currentType=task&&task.task_type||"shopping", currentPriority=task&&task.priority||"normal";
+        UI.modal(task?"Edit list item":"Add to a list",'<form id="task-form" data-id="'+(task?task.id:"")+'">'+
+        '<div class="modal-intro"><span class="modal-intro-icon">☑</span><div><strong>'+ (task?"Update this item":"Build a useful list") +'</strong><small>Lists are for anything your money needs to buy, pay or handle.</small></div></div>'+
+        '<div class="form-grid">'+field("list_name","List name","text","e.g. October essentials",'value="'+(task?UI.escape(task.list_name||"My list"):"My list")+'" required')+field("title","Item","text","e.g. CSC handout",'value="'+(task?UI.escape(task.title):"")+'" required maxlength="100")'+field("amount","Expected amount (₦)","number","0",'value="'+(task?task.amount:0)+'" min="0"')+field("due","Due date","date","",'value="'+(task&&task.due_date?task.due_date:"")+'"')+'</div>'+
+        choiceGroup("task_type",types,currentType,false)+choiceGroup("priority",priorities,currentPriority,false)+
+        '<label class="field"><span>Notes <small>Optional</small></span><textarea name="notes" maxlength="180" placeholder="Add a useful detail">'+(task?UI.escape(task.notes||""):"")+'</textarea></label>'+
+        '<p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">'+(task?"Save changes":"Add to list")+'</button></div></form>','Lists');
     }
     function openTool(tool){
         const titles={calculator:"Calculator","split-bill":"Split Bill","savings-calc":"Savings Calculator","daily-spend":"Daily Spending","percentage":"Percentage","discount":"Discount","goal-calc":"Goal Calculator","debt-calc":"Debt Calculator","afford":"Can I Afford This?"};
@@ -119,7 +147,41 @@ const App = (() => {
         }catch(e){console.error(e);if(err)err.textContent=e.message||"Something went wrong.";else UI.toast(e.message||"Something went wrong.","error");}
     }
     function openOnboarding(){
-        UI.modal("Make PocketWise fit you",'<form id="onboarding-form"><p class="form-hint">A few answers help us prioritize the right tools. You can change them later.</p><label class="field"><span>What describes you?</span><select name="persona"><option value="student">Student</option><option value="salary">Salary earner</option><option value="freelance">Self-employed / freelancer</option><option value="business">Business owner</option><option value="parent">Parent / household</option><option value="other">Other</option></select></label><label class="field"><span>How often does money usually come in?</span><select name="frequency"><option value="irregular">Irregularly</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="biweekly">Every two weeks</option><option value="monthly">Monthly</option><option value="multiple">Multiple sources</option></select></label><div class="check-grid"><label><input type="checkbox" name="focus" value="spending" checked> Manage spending</label><label><input type="checkbox" name="focus" value="lasting"> Make money last</label><label><input type="checkbox" name="focus" value="saving"> Save for goals</label><label><input type="checkbox" name="focus" value="bills"> Plan bills</label><label><input type="checkbox" name="focus" value="household"> Manage household money</label></div><button class="button primary wide-button">Continue</button></form>','Welcome');
+        const first=profile&&profile.full_name?profile.full_name.split(" ")[0]:"there";
+        const persona={label:"What best describes you?",items:[
+            {value:"student",label:"Student",note:"Allowance, school costs and everyday spending"},
+            {value:"salary",label:"Salary earner",note:"Regular pay, bills and personal spending"},
+            {value:"freelance",label:"Freelancer",note:"Income that can change from job to job"},
+            {value:"business",label:"Business owner",note:"Business money and personal commitments"},
+            {value:"parent",label:"Parent / household",note:"Family costs, bills and shared priorities"},
+            {value:"other",label:"Something else",note:"A little bit of everything"}
+        ]};
+        const frequency={label:"When does money usually come in?",items:[
+            {value:"irregular",label:"It varies",note:"No fixed pattern"},
+            {value:"daily",label:"Daily",note:"Money comes in most days"},
+            {value:"weekly",label:"Weekly",note:"About once a week"},
+            {value:"biweekly",label:"Every 2 weeks",note:"Biweekly"},
+            {value:"monthly",label:"Monthly",note:"Salary or regular monthly money"},
+            {value:"multiple",label:"Multiple sources",note:"Different sources at different times"}
+        ]};
+        const focus={label:"What should PocketWise help you with?",items:[
+            {value:"spending",label:"Track spending",note:"Know where money goes"},
+            {value:"lasting",label:"Make money last",note:"Plan what you can spend"},
+            {value:"saving",label:"Save for goals",note:"Build toward something specific"},
+            {value:"bills",label:"Stay on top of bills",note:"Remember upcoming payments"},
+            {value:"household",label:"Manage household money",note:"Groceries, school and family costs"}
+        ]};
+        const selectedPersona=profile&&profile.persona||"student";
+        const selectedFrequency=profile&&profile.money_frequency||"irregular";
+        const selectedFocus=profile&&profile.focus_areas&&profile.focus_areas.length?profile.focus_areas:["spending"];
+        UI.modal("Welcome to PocketWise",
+            '<form id="onboarding-form" class="onboarding-form">'+
+            '<div class="onboarding-hero"><div class="onboarding-icon">P</div><div><p class="eyebrow">Your workspace, your way</p><h2>Let’s make this feel like yours, '+UI.escape(first)+'.</h2><p>Tell us a little about how money reaches you and what you want PocketWise to help with. There are no wrong answers.</p></div></div>'+
+            '<div class="onboarding-section"><div class="onboarding-section-head"><span>01</span><div><strong>Your situation</strong><small>We’ll use this to prioritize your workspace.</small></div></div>'+choiceGroup("persona",persona,selectedPersona,false)+'</div>'+
+            '<div class="onboarding-section"><div class="onboarding-section-head"><span>02</span><div><strong>Your money rhythm</strong><small>Money does not have to arrive on a monthly schedule.</small></div></div>'+choiceGroup("frequency",frequency,selectedFrequency,false)+'</div>'+
+            '<div class="onboarding-section"><div class="onboarding-section-head"><span>03</span><div><strong>Your priorities</strong><small>Pick everything that matters to you right now.</small></div></div>'+choiceGroup("focus",focus,selectedFocus,true)+'</div>'+
+            '<p class="form-error"></p><div class="modal-actions onboarding-actions"><span class="onboarding-footnote">You can change these later in Settings.</span><button class="button primary">Build my workspace <span>→</span></button></div></form>',
+            "Getting started");
     }
     async function signOut(){try{await Auth.signOut();session=null;profile=null;workspace={transactions:[],budget:null,goals:[],plans:[],allocations:[],tasks:[]};location.hash="home";renderPublic();}catch(e){UI.toast("Unable to sign out.","error");}}
     async function enterWorkspace(){location.hash="dashboard";loading=true;renderPrivate();try{profile=await Data.profile(session.user);workspace=await Data.all();}catch(e){console.error(e);UI.toast("Unable to load your workspace.","error");}finally{loading=false;renderPrivate();if(profile&&!profile.onboarding_complete)openOnboarding();}}
