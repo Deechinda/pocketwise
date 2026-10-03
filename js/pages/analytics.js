@@ -1,191 +1,20 @@
 const AnalyticsPage = (() => {
-    const chartColors = [
-        "#1b9b68",
-        "#e7a23b",
-        "#5479d8",
-        "#8857c8",
-        "#df6262",
-        "#3aa3a0",
-    ];
-
-    function render(context) {
-        const { data, pageHeader } = context;
-
-        if (data.transactions.length < 2) {
-            return `
-                ${pageHeader(
-                    "Analytics",
-                    "Simple insights from your financial activity.",
-                )}
-                <section class="card">
-                    ${UI.empty(
-                        "Not enough data yet",
-                        "Add transactions to see your spending patterns.",
-                        "add-expense",
-                        "Add transaction",
-                    )}
-                </section>
-            `;
-        }
-
-        return `
-            ${pageHeader(
-                "Analytics",
-                "Simple insights from your real financial activity.",
-            )}
-            <section class="analytics-grid stagger-group">
-                <article class="card">
-                    <div class="card-head"><h2>Income vs expenses</h2></div>
-                    <div class="chart-wrap">
-                        <canvas id="income-expense-chart"></canvas>
-                    </div>
-                </article>
-                <article class="card">
-                    <div class="card-head"><h2>Spending by category</h2></div>
-                    <div class="chart-wrap">
-                        <canvas id="category-chart"></canvas>
-                    </div>
-                </article>
-                <article class="card wide">
-                    <div class="card-head"><h2>Monthly spending</h2></div>
-                    <div class="chart-wrap line">
-                        <canvas id="monthly-chart"></canvas>
-                    </div>
-                </article>
-            </section>
-            <section class="card analytics-insights">
-                ${DashboardPage.renderInsights(context)}
-            </section>
-        `;
+    function render(context){
+        const data=context.data, t=context.totals(), cats=context.categoryTotals(data.transactions);
+        const top=Object.entries(cats).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+        const insights=[];
+        if(top[0]) insights.push(top[0][0]+" is currently your largest spending category at "+UI.money(top[0][1])+".");
+        if(t.income) insights.push("You have recorded "+Math.round(t.expense/t.income*100)+"% of your money-in as spending.");
+        if(data.goals.length) insights.push(data.goals.filter(function(g){return Number(g.current_amount)>=Number(g.target_amount);}).length+" of "+data.goals.length+" goals have reached their target.");
+        return context.pageHeader("Insights","Simple patterns from your real PocketWise activity.")+'<section class="insight-metrics"><div><span>Total in</span><strong class="positive">'+UI.money(t.income)+'</strong></div><div><span>Total out</span><strong class="negative">'+UI.money(t.expense)+'</strong></div><div><span>Net</span><strong>'+UI.money(t.income-t.expense)+'</strong></div></section><section class="analytics-grid"><article class="surface-card chart-panel"><div class="card-head"><h2>Money in vs out</h2></div><div class="chart-wrap"><canvas id="income-expense-chart"></canvas></div></article><article class="surface-card chart-panel"><div class="card-head"><h2>Where money goes</h2></div><div class="chart-wrap"><canvas id="category-chart"></canvas></div></article><article class="surface-card wide"><div class="card-head"><h2>Useful patterns</h2></div>'+(insights.length?insights.map(function(i){return '<div class="insight"><span>✦</span><p>'+i+'</p></div>';}).join(""):UI.empty("Insights are waiting","Add a few money entries to see patterns."))+'</article></section>';
     }
-
-    function createCharts(context, activeCharts) {
-        if (typeof Chart === "undefined" || context.loading) {
-            return;
-        }
-
-        const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                duration: 650,
-                easing: "easeOutQuart",
-            },
-            plugins: {
-                legend: {
-                    position: "bottom",
-                    labels: {
-                        usePointStyle: true,
-                        padding: 18,
-                    },
-                },
-            },
-        };
-
-        function createChart(elementId, configuration) {
-            const canvas = document.querySelector(`#${elementId}`);
-
-            if (canvas) {
-                activeCharts.push(new Chart(canvas, configuration));
-            }
-        }
-
-        const categoryTotals = context.categoryTotals(context.data.transactions);
-        const transactionTotals = context.totals();
-        const currentMonthCategories = context.categoryTotals(context.monthly());
-
-        createChart("spending-chart", {
-            type: "doughnut",
-            data: {
-                labels: Object.keys(currentMonthCategories),
-                datasets: [
-                    {
-                        data: Object.values(currentMonthCategories),
-                        backgroundColor: chartColors,
-                        borderWidth: 0,
-                    },
-                ],
-            },
-            options: { ...chartOptions, cutout: "70%" },
-        });
-
-        createChart("category-chart", {
-            type: "doughnut",
-            data: {
-                labels: Object.keys(categoryTotals),
-                datasets: [
-                    {
-                        data: Object.values(categoryTotals),
-                        backgroundColor: chartColors,
-                        borderWidth: 0,
-                    },
-                ],
-            },
-            options: { ...chartOptions, cutout: "68%" },
-        });
-
-        createChart("income-expense-chart", {
-            type: "bar",
-            data: {
-                labels: ["Income", "Expenses"],
-                datasets: [
-                    {
-                        data: [transactionTotals.income, transactionTotals.expense],
-                        backgroundColor: ["#1b9b68", "#df6262"],
-                        borderRadius: 8,
-                    },
-                ],
-            },
-            options: {
-                ...chartOptions,
-                plugins: { legend: { display: false } },
-            },
-        });
-
-        const months = [];
-
-        for (let offset = 5; offset >= 0; offset -= 1) {
-            const date = new Date();
-            date.setMonth(date.getMonth() - offset);
-            months.push({
-                key: date.toISOString().slice(0, 7),
-                label: date.toLocaleDateString("en", { month: "short" }),
-            });
-        }
-
-        const monthlyTotals = months.map((month) => {
-            return context.data.transactions
-                .filter((transaction) => {
-                    return (
-                        transaction.type === "expense" &&
-                        transaction.date.startsWith(month.key)
-                    );
-                })
-                .reduce((total, transaction) => {
-                    return total + Number(transaction.amount);
-                }, 0);
-        });
-
-        createChart("monthly-chart", {
-            type: "line",
-            data: {
-                labels: months.map((month) => month.label),
-                datasets: [
-                    {
-                        data: monthlyTotals,
-                        borderColor: "#1b9b68",
-                        backgroundColor: "rgba(27, 155, 104, 0.1)",
-                        fill: true,
-                        tension: 0.35,
-                    },
-                ],
-            },
-            options: {
-                ...chartOptions,
-                plugins: { legend: { display: false } },
-            },
-        });
+    function createCharts(context,charts){
+        if(typeof Chart==="undefined") return;
+        const t=context.totals(), cats=context.categoryTotals(context.data.transactions);
+        const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{usePointStyle:true,padding:14}}}};
+        const a=document.querySelector("#income-expense-chart"), b=document.querySelector("#category-chart");
+        if(a) charts.push(new Chart(a,{type:"bar",data:{labels:["Money in","Money out"],datasets:[{data:[t.income,t.expense],backgroundColor:["#15805c","#d96a6a"],borderRadius:9}]},options:{...base,plugins:{legend:{display:false}}}}));
+        if(b) charts.push(new Chart(b,{type:"doughnut",data:{labels:Object.keys(cats),datasets:[{data:Object.values(cats),backgroundColor:["#15805c","#8ecdb3","#f0b866","#6f8bd9","#c27bdc","#de7474"],borderWidth:0}]},options:{...base,cutout:"68%"}}));
     }
-
-    return { render, createCharts };
+    return {render,createCharts};
 })();
