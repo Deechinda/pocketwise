@@ -1,71 +1,7 @@
 const SettingsPage = (() => {
-    function render(context) {
-        const { profile, session, pageHeader, field } = context;
-
-        return `
-            ${pageHeader("Settings", "Manage your profile, appearance and account.")}
-
-            <div class="settings-grid stagger-group">
-                <section class="card">
-                    <div class="card-head">
-                        <div>
-                            <p class="eyebrow">Profile</p>
-                            <h2>Your details</h2>
-                        </div>
-                    </div>
-                    <form id="profile-form">
-                        ${field(
-                            "fullName",
-                            "Full name",
-                            "text",
-                            "Your name",
-                            `value="${UI.escape(profile?.full_name || "")}" required`,
-                        )}
-                        <label class="field">
-                            <span>Email address</span>
-                            <input value="${UI.escape(session.user.email)}" disabled>
-                        </label>
-                        <p class="form-error"></p>
-                        <button class="button primary">Save profile</button>
-                    </form>
-                </section>
-
-                <section class="card settings-card">
-                    <div class="settings-icon">◐</div>
-                    <div>
-                        <h2>Appearance</h2>
-                        <p>Choose a comfortable theme.</p>
-                    </div>
-                    <div class="segmented">
-                        <button data-action="set-theme" data-value="light">☀ Light</button>
-                        <button data-action="set-theme" data-value="dark">☾ Dark</button>
-                    </div>
-                </section>
-
-                <section class="card settings-card">
-                    <div class="settings-icon">⇩</div>
-                    <div>
-                        <h2>Your data</h2>
-                        <p>Download a copy of your personal records.</p>
-                    </div>
-                    <button class="button secondary" data-action="export-data">
-                        Export personal data
-                    </button>
-                </section>
-
-                <section class="card settings-card">
-                    <div class="settings-icon">→</div>
-                    <div>
-                        <h2>Account</h2>
-                        <p>Securely end your current session.</p>
-                    </div>
-                    <button class="button danger-button" data-action="sign-out">
-                        Sign out
-                    </button>
-                </section>
-            </div>
-        `;
+    function render(context){
+        const p=context.profile||{}, s=context.session;
+        return context.pageHeader("Settings","Your profile, preferences and PocketWise controls.")+'<div class="settings-grid"><section class="surface-card"><div class="card-head"><div><p class="eyebrow">Profile</p><h2>About you</h2></div></div><form id="profile-form">'+context.field("fullName","Full name","text","Your name",'value="'+UI.escape(p.full_name||"")+'" required')+'<label class="field"><span>Email</span><input value="'+UI.escape(s.user.email)+'" disabled></label><label class="field"><span>What describes you?</span><select name="persona"><option value="student" '+(p.persona==="student"?"selected":"")+'>Student</option><option value="salary" '+(p.persona==="salary"?"selected":"")+'>Salary earner</option><option value="freelance" '+(p.persona==="freelance"?"selected":"")+'>Self-employed / freelancer</option><option value="business" '+(p.persona==="business"?"selected":"")+'>Business owner</option><option value="parent" '+(p.persona==="parent"?"selected":"")+'>Parent / household</option><option value="other" '+(p.persona==="other"?"selected":"")+'>Other</option></select></label><p class="form-error"></p><button class="button primary">Save profile</button></form></section><section class="surface-card settings-links"><button data-action="set-theme" data-value="light"><span>☀</span><div><strong>Light appearance</strong><small>Bright, clean workspace</small></div></button><button data-action="set-theme" data-value="dark"><span>☾</span><div><strong>Dark appearance</strong><small>Lower-light workspace</small></div></button><button data-action="export-data"><span>⇩</span><div><strong>Export your data</strong><small>Download a copy of your records</small></div></button><button data-action="sign-out"><span>↪</span><div><strong>Sign out</strong><small>End this session securely</small></div></button></section></div>';
     }
-
-    return { render };
+    return {render};
 })();
