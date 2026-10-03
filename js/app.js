@@ -57,7 +57,7 @@ const App = (() => {
         else if(tool==="percentage") body=field("a","Amount","number","50000",'id="tool-a"')+field("b","Percentage","number","10",'id="tool-b"')+'<p class="tool-result" id="tool-result"></p>';
         else if(tool==="discount") body=field("a","Original price (₦)","number","50000",'id="tool-a"')+field("b","Discount (%)","number","10",'id="tool-b"')+'<p class="tool-result" id="tool-result"></p>';
         else if(tool==="debt-calc") body=field("a","Debt amount (₦)","number","100000",'id="tool-a"')+field("b","Monthly payment (₦)","number","20000",'id="tool-b"')+'<p class="tool-result" id="tool-result"></p>';
-        else body=field("a","Purchase amount (₦)","number","8000",'id="tool-a")+'<p class="tool-result" id="tool-result"></p>';
+        else body=field("a","Purchase amount (₦)","number","8000",'id="tool-a"')+'<p class="tool-result" id="tool-result"></p>';
         UI.modal(titles[tool]||"Tool",'<form id="tool-form" data-tool="'+tool+'">'+body+'<div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Close</button><button class="button primary">Calculate</button></div></form>','Tools');
     }
     function calculateTool(form){
