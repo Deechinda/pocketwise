@@ -2,10 +2,10 @@
 
 ## Project overview
 
-**Title:** PocketWise — Student Budgeting Workspace  
-**Problem:** Students often receive limited or irregular income but lack a simple way to see where it goes. Many finance tools are too complex for everyday student budgeting.  
+**Title:** PocketWise — Personal Money Management Workspace  
+**Problem:** People can receive money in different ways and still need a simple way to decide what it should do, track spending, handle upcoming payments and reach savings goals.  
 **Aim:** Build a simple, secure and responsive application for recording money, planning spending and tracking savings.  
-**Users:** Primarily Nigerian university students. All amounts use Nigerian Naira.
+**Users:** Students, salary earners, freelancers, business owners, parents and other personal finance users. All amounts use Nigerian Naira.
 
 ## Objectives and features
 
