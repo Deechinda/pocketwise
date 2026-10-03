@@ -1,6 +1,6 @@
 # PocketWise
 
-PocketWise is a polished, multi-user budgeting workspace for Nigerian students. Every new account begins empty: no sample transactions, totals, budgets, goals, charts, or invented insights.
+PocketWise is a polished, multi-user personal money-management workspace built around spending, plans, goals, money tasks and everyday financial tools. Every new account begins empty: no sample transactions, totals, budgets, goals, charts, or invented insights.
 
 ## Features
 
