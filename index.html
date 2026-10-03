@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+        <meta
+            name="description"
+            content="PocketWise is a private budgeting workspace for students."
+        />
+        <meta name="theme-color" content="#0b3528" />
+
+        <title>PocketWise — Take control of your money</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/components.css" />
+        <link rel="stylesheet" href="css/responsive.css" />
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+            defer
+        ></script>
+
+        <script src="js/supabase.js" defer></script>
+        <script src="js/auth.js" defer></script>
+        <script src="js/data.js" defer></script>
+        <script src="js/ui.js" defer></script>
+        <script src="js/components/navigation.js" defer></script>
+        <script src="js/components/public-views.js" defer></script>
+        <script src="js/components/hero.js" defer></script>
+        <script src="js/pages/dashboard.js" defer></script>
+        <script src="js/pages/transactions.js" defer></script>
+        <script src="js/pages/budget.js" defer></script>
+        <script src="js/pages/savings.js" defer></script>
+        <script src="js/pages/analytics.js" defer></script>
+        <script src="js/pages/settings.js" defer></script>
+        <script src="js/app.js" defer></script>
+    </head>
+
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+
+        <!-- Landing and authentication views are rendered here. -->
+        <div id="public-root"></div>
+
+        <!-- Authenticated Application -->
+        <div id="private-root" hidden>
+            <aside class="sidebar">
+                <a class="brand" href="#dashboard" data-route="dashboard">
+                    <span class="brand-mark">P</span>
+                    <span>
+                        <strong>PocketWise</strong>
+                        <small>Student finance</small>
+                    </span>
+                </a>
+
+                <nav class="nav-list" id="desktop-nav"></nav>
+
+                <div class="sidebar-footer">
+                    <button class="theme-button" data-action="toggle-theme">
+                        <span data-theme-icon>☾</span>
+                        <span data-theme-label>Dark mode</span>
+                    </button>
+
+                    <p>
+                        Private workspace<br />
+                        <small>Protected by your account</small>
+                    </p>
+                </div>
+            </aside>
+
+            <div class="app-shell">
+                <header class="topbar">
+                    <a
+                        class="mobile-brand brand"
+                        href="#dashboard"
+                        data-route="dashboard"
+                    >
+                        <span class="brand-mark">P</span>
+                        <strong>PocketWise</strong>
+                    </a>
+
+                    <div class="topbar-actions">
+                        <span class="date-chip" id="today-label"></span>
+
+                        <button
+                            class="icon-button mobile-theme"
+                            data-action="toggle-theme"
+                            aria-label="Toggle theme"
+                        >
+                            <span data-theme-icon>☾</span>
+                        </button>
+
+                        <div class="profile-wrap">
+                            <button
+                                class="avatar"
+                                data-action="profile-menu"
+                                aria-label="Open profile menu"
+                            >
+                                PW
+                            </button>
+
+                            <div class="profile-menu" id="profile-menu" hidden>
+                                <button data-route="settings">
+                                    Profile &amp; settings
+                                </button>
+                                <button data-action="sign-out">Sign out</button>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main id="main" tabindex="-1">
+                    <div id="view"></div>
+                </main>
+            </div>
+
+            <nav class="bottom-nav" id="mobile-nav" aria-label="Mobile navigation"></nav>
+        </div>
+
+        <!-- Shared Modal -->
+        <div class="modal-backdrop" id="modal-backdrop" hidden>
+            <section
+                class="modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-title"
+            >
+                <header class="modal-header">
+                    <div>
+                        <p class="eyebrow" id="modal-eyebrow">PocketWise</p>
+                        <h2 id="modal-title"></h2>
+                    </div>
+
+                    <button
+                        class="icon-button"
+                        data-action="close-modal"
+                        aria-label="Close dialog"
+                    >
+                        ×
+                    </button>
+                </header>
+
+                <div id="modal-body" class="modal-body"></div>
+            </section>
+        </div>
+
+        <!-- Accessible status messages -->
+        <div id="toast-region" class="toast-region" aria-live="polite"></div>
+    </body>
+</html>
