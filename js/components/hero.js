@@ -134,6 +134,101 @@ const HeroMotion = (() => {
         cleanupHandlers.push(() => observer.disconnect());
     }
 
+    function sequenceLandingCopy() {
+        const messageSets = {
+            rhythm: [
+                "Every kind of income deserves a clear plan.",
+                "See what arrived before deciding what leaves.",
+                "Bring every naira into one calm view.",
+            ],
+            clarity: [
+                "Know what is safe to spend before you spend it.",
+                "Protect the important things first.",
+                "Make the next money decision with confidence.",
+            ],
+        };
+
+        document.querySelectorAll("[data-word-loop]").forEach((element) => {
+            const messages = messageSets[element.dataset.wordLoop];
+            if (!messages?.length) return;
+
+            if (prefersReducedMotion()) {
+                element.textContent = messages[0];
+                return;
+            }
+
+            let messageIndex = 0;
+            let started = false;
+            let active = true;
+            const timers = new Set();
+
+            function schedule(callback, delay) {
+                const timer = window.setTimeout(() => {
+                    timers.delete(timer);
+                    if (active) callback();
+                }, delay);
+                timers.add(timer);
+            }
+
+            function showMessage() {
+                const words = messages[messageIndex].split(" ");
+                element.replaceChildren(
+                    ...words.map((word, index) => {
+                        const span = document.createElement("span");
+                        span.className = "story-word";
+                        span.style.setProperty("--word-index", index);
+                        span.textContent = word;
+                        return span;
+                    }),
+                );
+
+                schedule(() => {
+                    element
+                        .querySelectorAll(".story-word")
+                        .forEach((word) => word.classList.add("is-visible"));
+                }, 35);
+
+                const readingTime = words.length * 72 + 2600;
+                schedule(() => {
+                    element
+                        .querySelectorAll(".story-word")
+                        .forEach((word) => word.classList.add("is-leaving"));
+                    schedule(() => {
+                        messageIndex = (messageIndex + 1) % messages.length;
+                        showMessage();
+                    }, words.length * 34 + 520);
+                }, readingTime);
+            }
+
+            function begin() {
+                if (started) return;
+                started = true;
+                showMessage();
+            }
+
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver(
+                    ([entry]) => {
+                        if (!entry.isIntersecting) return;
+                        begin();
+                        observer.disconnect();
+                    },
+                    { threshold: 0.45 },
+                );
+                observer.observe(element);
+                cleanupHandlers.push(() => observer.disconnect());
+            } else {
+                begin();
+            }
+
+            cleanupHandlers.push(() => {
+                active = false;
+                timers.forEach((timer) => window.clearTimeout(timer));
+                timers.clear();
+            });
+        });
+    }
+
     function enablePointerParallax(hero) {
         const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
         if (!finePointer.matches || prefersReducedMotion()) return;
@@ -207,6 +302,7 @@ const HeroMotion = (() => {
         if (!hero) return;
 
         observeLandingSections();
+        sequenceLandingCopy();
 
         if (prefersReducedMotion()) {
             hero.classList.add("hero-in-view", "motion-ready");

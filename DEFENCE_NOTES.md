@@ -62,7 +62,7 @@ Possible future work includes custom categories, recurring transactions, offline
 
 **Why PostgreSQL?** Financial records are structured and related to users. PostgreSQL provides strong types, constraints, indexes and secure row policies.
 
-**Why authentication?** It gives every student a private, persistent workspace that can be accessed again after logout or on another device.
+**Why authentication?** It gives every user a private, persistent workspace that can be accessed again after logout or on another device.
 
 **How is user data separated?** Every financial row stores the authenticated UUID. RLS checks that UUID against `auth.uid()` for every operation.
 

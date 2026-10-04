@@ -12,6 +12,17 @@
         />
         <meta name="theme-color" content="#0b3528" />
 
+        <script>
+            (() => {
+                const savedTheme = localStorage.getItem("pocketwise_theme");
+                if (savedTheme === "dark" || savedTheme === "light") {
+                    document.documentElement.dataset.theme = savedTheme;
+                    document.querySelector('meta[name="theme-color"]').content =
+                        savedTheme === "dark" ? "#06140f" : "#f8f8f3";
+                }
+            })();
+        </script>
+
         <title>PocketWise — Take control of your money</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
