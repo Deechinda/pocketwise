@@ -103,10 +103,38 @@ const PublicViews = (() => {
 
     function landing() {
         const features = [
-            ["↕", "Track spending", "Know exactly where your money goes."],
-            ["◉", "Set budgets", "See what you have spent and what remains."],
-            ["◇", "Save toward goals", "Build steady progress toward what matters."],
-            ["▥", "Understand habits", "Use clear analytics to spot spending patterns."],
+            [
+                "01",
+                "SEE CLEARLY",
+                "Know what is truly available",
+                "Bring income and spending into one honest view, so your balance means something at a glance.",
+                "₦85,400",
+                "available now",
+            ],
+            [
+                "02",
+                "PLAN WITH PURPOSE",
+                "Give every naira a next job",
+                "Protect essentials, make room for everyday life and see what remains before you spend it.",
+                "62%",
+                "of plan used",
+            ],
+            [
+                "03",
+                "BUILD STEADILY",
+                "Save at a pace that feels real",
+                "Turn a laptop, school fee or emergency fund into a visible goal you can keep moving forward.",
+                "50%",
+                "goal complete",
+            ],
+            [
+                "04",
+                "LEARN YOUR RHYTHM",
+                "Notice patterns before they cost you",
+                "Simple insights reveal where money tends to go, without turning your finances into homework.",
+                "Food",
+                "top category",
+            ],
         ];
 
         return `
@@ -159,19 +187,51 @@ const PublicViews = (() => {
                       </div>
                     </section>
 
-                    <section id="features" class="section reveal-group">
-                        <div class="section-heading reveal">
-                            <p class="eyebrow">Built for everyday money</p>
-                            <h2>Everything you need. Nothing you don't.</h2>
+                    <section class="landing-intro section" data-reveal>
+                        <p class="eyebrow">Money is rarely one-size-fits-all</p>
+                        <div class="landing-intro-grid">
+                            <h2>
+                                Your money has a rhythm.<br>
+                                <span>PocketWise helps you read it.</span>
+                            </h2>
+                            <div>
+                                <p>
+                                    Some money arrives monthly. Some comes from family,
+                                    a side hustle or the occasional good week. PocketWise
+                                    gives every kind of income one calm place to make sense.
+                                </p>
+                                <div class="income-rhythm" aria-label="Examples of income rhythms">
+                                    <span>Allowance</span><span>Salary</span><span>Side hustle</span><span>Support</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="feature-grid stagger-group">
+                    </section>
+
+                    <section id="features" class="feature-showcase section">
+                        <div class="section-heading feature-heading" data-reveal>
+                            <p class="eyebrow">Clarity for everyday money</p>
+                            <h2>Less guessing.<br>More knowing what comes next.</h2>
+                            <p>
+                                PocketWise turns scattered money decisions into a clear,
+                                connected picture you can actually use.
+                            </p>
+                        </div>
+                        <div class="feature-grid">
                             ${features
                                 .map(
-                                    ([icon, title, description]) => `
-                                <article class="feature reveal">
-                                    <span>${icon}</span>
+                                    ([number, label, title, description, value, valueLabel], index) => `
+                                <article class="feature" data-reveal style="--reveal-order:${index}">
+                                    <div class="feature-topline">
+                                        <span>${number}</span>
+                                        <small>${label}</small>
+                                    </div>
                                     <h3>${title}</h3>
                                     <p>${description}</p>
+                                    <div class="feature-signal">
+                                        <strong>${value}</strong>
+                                        <small>${valueLabel}</small>
+                                        <i aria-hidden="true"></i>
+                                    </div>
                                 </article>
                             `,
                                 )
@@ -179,61 +239,65 @@ const PublicViews = (() => {
                         </div>
                     </section>
 
-                    <section id="how" class="how section reveal">
-                        <div>
-                            <p class="eyebrow">How it works</p>
-                            <h2>Good money habits, made straightforward.</h2>
+                    <section class="money-rhythm-section">
+                        <div class="money-rhythm section" data-reveal>
+                            <div class="money-rhythm-copy">
+                                <p class="eyebrow">One connected money story</p>
+                                <h2>See where your money came from—and where it needs to go.</h2>
+                                <p>
+                                    PocketWise connects the moment money arrives to the choices
+                                    you make next. No disconnected spreadsheets. No mental maths.
+                                </p>
+                                <a class="text-link" href="#signup">Build your workspace <span>→</span></a>
+                            </div>
+                            <div class="money-path" aria-label="PocketWise money flow">
+                                <div class="money-path-line" aria-hidden="true"><i></i></div>
+                                <article><span>↙</span><div><small>MONEY IN</small><strong>Record what arrived</strong><p>Allowance, salary, support or side-hustle income.</p></div></article>
+                                <article><span>▣</span><div><small>MAKE A PLAN</small><strong>Protect what matters</strong><p>Set aside essentials before everyday spending begins.</p></div></article>
+                                <article><span>◇</span><div><small>MOVE FORWARD</small><strong>Grow something meaningful</strong><p>Keep goals visible and make progress at your own pace.</p></div></article>
+                            </div>
                         </div>
-                        <ol class="stagger-group">
-                            <li><b>01</b><span><strong>Create your account</strong><small>Open your private PocketWise workspace.</small></span></li>
-                            <li><b>02</b><span><strong>Track your money</strong><small>Add income, expenses and a monthly budget.</small></span></li>
-                            <li><b>03</b><span><strong>Reach your goals</strong><small>Follow progress and understand your habits.</small></span></li>
+                    </section>
+
+                    <section id="how" class="how-section section">
+                        <div class="how-heading" data-reveal>
+                            <p class="eyebrow">Simple from the first entry</p>
+                            <h2>A better money routine in three thoughtful steps.</h2>
+                            <p>No complicated setup. Start with what you know today and let the picture become clearer over time.</p>
+                        </div>
+                        <ol class="how-steps">
+                            <li data-reveal style="--reveal-order:0"><b>01</b><span><small>START WITH REALITY</small><strong>Add the money you have</strong><p>Record income and spending as they happen. Your workspace begins empty and becomes useful with your real numbers.</p></span></li>
+                            <li data-reveal style="--reveal-order:1"><b>02</b><span><small>MAKE IT INTENTIONAL</small><strong>Plan what happens next</strong><p>Divide available money between essentials, flexible spending and the goals that matter to you.</p></span></li>
+                            <li data-reveal style="--reveal-order:2"><b>03</b><span><small>KEEP THE PICTURE CLEAR</small><strong>Review, adjust and continue</strong><p>Use activity and insights to notice patterns early, then make your next decision with more confidence.</p></span></li>
                         </ol>
                     </section>
 
-                    <section id="workflow" class="workflow section reveal">
-                        <div class="section-heading">
-                            <p class="eyebrow">Your financial workflow</p>
-                            <h2>From money in to better decisions.</h2>
-                            <p>Each record adds clarity to the next step.</p>
-                        </div>
-                        <div class="workflow-track stagger-group">
-                            <article><span>↙</span><strong>Income</strong><small>Record money received</small></article>
-                            <i>→</i>
-                            <article><span>↗</span><strong>Expenses</strong><small>Understand where it goes</small></article>
-                            <i>→</i>
-                            <article><span>◉</span><strong>Budget</strong><small>Set a monthly limit</small></article>
-                            <i>→</i>
-                            <article><span>◇</span><strong>Savings</strong><small>Build toward goals</small></article>
-                            <i>→</i>
-                            <article><span>▥</span><strong>Insights</strong><small>See useful patterns</small></article>
-                        </div>
-                    </section>
-
                     <section id="security" class="trust-shell">
-                      <div class="trust section reveal">
+                      <div class="trust section" data-reveal>
                         <div class="trust-copy">
-                            <p class="eyebrow">Your workspace stays yours</p>
-                            <h2>Private by account, protected in the database.</h2>
+                            <p class="eyebrow">Privacy is part of the product</p>
+                            <h2>Your financial picture belongs to you.</h2>
                             <p>
-                                PocketWise associates every financial record with your
-                                signed-in account. Supabase Authentication and database
-                                Row Level Security keep each user's workspace separate.
+                                Every record is connected to your signed-in account.
+                                Secure authentication and database-level access rules keep
+                                each PocketWise workspace separate by design.
                             </p>
                         </div>
                         <div class="trust-points">
-                            <span>✓ Secure authentication</span>
-                            <span>✓ Account-based records</span>
-                            <span>✓ Protected database access</span>
+                            <span><i>01</i><b>Secure sign-in</b><small>Your workspace opens only through your account.</small></span>
+                            <span><i>02</i><b>Separated records</b><small>Your financial entries stay connected to your user ID.</small></span>
+                            <span><i>03</i><b>Database protection</b><small>Row Level Security reinforces access where the data lives.</small></span>
                         </div>
                       </div>
                     </section>
 
-                    <section class="final-cta section reveal">
-                        <p class="eyebrow">A clearer view starts here</p>
-                        <h2>Your money deserves a clearer view.</h2>
-                        <p>Create your private PocketWise workspace.</p>
-                        <a class="button primary" href="#signup">Get started →</a>
+                    <section class="final-cta section" data-reveal>
+                        <div>
+                            <p class="eyebrow">Start with the money you have today</p>
+                            <h2>Clarity is a habit.<br>PocketWise gives it a home.</h2>
+                            <p>Create your private workspace and make your next money decision with a clearer view.</p>
+                        </div>
+                        <a class="button primary" href="#signup">Create your workspace <span>→</span></a>
                     </section>
                 </main>
 

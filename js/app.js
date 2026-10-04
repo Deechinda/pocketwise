@@ -30,7 +30,7 @@ const App = (() => {
         Navigation.render(routes,activeRoute);
         activeCharts.forEach(function(c){c.destroy();});activeCharts=[];
         select("#view").innerHTML=loading?'<div class="loading-view"><span></span><span></span><span></span></div>':pages[activeRoute].render(context());
-        requestAnimationFrame(function(){if(AnalyticsPage.createCharts)AnalyticsPage.createCharts(context(),activeCharts);select("#view").classList.add("view-ready");});
+        requestAnimationFrame(function(){const activePage=pages[activeRoute];if(activePage.createCharts)activePage.createCharts(context(),activeCharts);select("#view").classList.add("view-ready");});
     }
     async function reload(message){loading=true;renderPrivate();try{workspace=await Data.all();if(message)UI.toast(message);}catch(e){console.error(e);UI.toast("Could not load your PocketWise data.","error");}finally{loading=false;renderPrivate();}}
     function openTransaction(type,transaction){
@@ -70,7 +70,7 @@ const App = (() => {
         const currentType=task&&task.task_type||"shopping", currentPriority=task&&task.priority||"normal";
         UI.modal(task?"Edit list item":"Add to a list",'<form id="task-form" data-id="'+(task?task.id:"")+'">'+
         '<div class="modal-intro"><span class="modal-intro-icon">☑</span><div><strong>'+ (task?"Update this item":"Build a useful list") +'</strong><small>Lists are for anything your money needs to buy, pay or handle.</small></div></div>'+
-        '<div class="form-grid">'+field("list_name","List name","text","e.g. October essentials",'value="'+(task?UI.escape(task.list_name||"My list"):"My list")+'" required')+field("title","Item","text","e.g. CSC handout",'value="'+(task?UI.escape(task.title):"")+'" required maxlength="100")'+field("amount","Expected amount (₦)","number","0",'value="'+(task?task.amount:0)+'" min="0"')+field("due","Due date","date","",'value="'+(task&&task.due_date?task.due_date:"")+'"')+'</div>'+
+        '<div class="form-grid">'+field("list_name","List name","text","e.g. October essentials",'value="'+(task?UI.escape(task.list_name||"My list"):"My list")+'" required')+field("title","Item","text","e.g. CSC handout",'value="'+(task?UI.escape(task.title):"")+'" required maxlength="100"')+field("amount","Expected amount (₦)","number","0",'value="'+(task?task.amount:0)+'" min="0"')+field("due","Due date","date","",'value="'+(task&&task.due_date?task.due_date:"")+'"')+'</div>'+
         choiceGroup("task_type",types,currentType,false)+choiceGroup("priority",priorities,currentPriority,false)+
         '<label class="field"><span>Notes <small>Optional</small></span><textarea name="notes" maxlength="180" placeholder="Add a useful detail">'+(task?UI.escape(task.notes||""):"")+'</textarea></label>'+
         '<p class="form-error"></p><div class="modal-actions"><button type="button" class="button ghost" data-action="close-modal">Cancel</button><button class="button primary">'+(task?"Save changes":"Add to list")+'</button></div></form>','Lists');

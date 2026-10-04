@@ -110,6 +110,30 @@ const HeroMotion = (() => {
         cleanupHandlers.push(() => observer.disconnect());
     }
 
+    function observeLandingSections() {
+        const sections = document.querySelectorAll("[data-reveal], .reveal");
+        if (!sections.length) return;
+
+        if (prefersReducedMotion() || !("IntersectionObserver" in window)) {
+            sections.forEach((section) => section.classList.add("visible"));
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                });
+            },
+            { threshold: 0.14, rootMargin: "0px 0px -7% 0px" },
+        );
+
+        sections.forEach((section) => observer.observe(section));
+        cleanupHandlers.push(() => observer.disconnect());
+    }
+
     function enablePointerParallax(hero) {
         const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
         if (!finePointer.matches || prefersReducedMotion()) return;
@@ -181,6 +205,8 @@ const HeroMotion = (() => {
         stop();
         const hero = document.querySelector("[data-hero]");
         if (!hero) return;
+
+        observeLandingSections();
 
         if (prefersReducedMotion()) {
             hero.classList.add("hero-in-view", "motion-ready");
